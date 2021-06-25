@@ -1,0 +1,13 @@
+SECRETS/
+
+.vscode/
+
+.idea/
+
+__pycache__/
+
+foobar/
+
+foo.py
+
+*.json
