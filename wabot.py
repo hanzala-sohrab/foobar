@@ -44,16 +44,31 @@ class WABot():
         return self.send_requests("sendMessage", {})
 
     def start(self,chatId):
+        worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
         interval = [t for t in range(1, 61)]
+        i = 0
         for number in numbers:
-            chatId = f"{number}@c.us"
-            resp = self.send_message(chatId=chatId, text="Hello friend")
-            time.sleep(random.choice(interval))
+            i += 1
+            try:
+                val = worksheet.acell(f"C{i}").value
+                if val is None:
+                    phone = int(number)
+                    chatId = f"{number}@c.us"
+                    f = worksheet.acell("D1").value
+                    if f == "1":
+                        resp = self.send_message(chatId=chatId, text="Hello friend")
+                        worksheet.update(f"C{i}", "Sent")
+                        time.sleep(random.choice(interval))
+                    else:
+                        break
+            except:
+                continue
         return {"status": "success"}
 
     def stop(self, chatId):
-        pass
+        worksheet.update("D1", "0")
+        return {"status": "success"}
 
     def processing(self):
         if self.dict_messages != []:
