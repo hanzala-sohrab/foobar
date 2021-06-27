@@ -57,7 +57,7 @@ class WABot():
                     chatId = f"{number}@c.us"
                     f = worksheet.acell("D1").value
                     if f == "1":
-                        resp = self.send_message(chatId=chatId, text="Hello friend")
+                        resp = self.send_message(chatId=chatId, text="Hello")
                         worksheet.update(f"C{i}", "Sent")
                         time.sleep(random.choice(interval))
                     else:
