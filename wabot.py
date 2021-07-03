@@ -77,7 +77,7 @@ class WABot():
                 text = message['body'].split()
                 if not message['fromMe']:
                     id  = message['chatId']
-                    if  id == "919031738599@c.us":
+                    if id == foo.CHAT_ID:
                         url = f"{self.APIUrl}messagesHistory?page=0&count=10&chatId={id}&token={self.token}"
                         foo = requests.get(url).json()["messages"]
                         prevMessage = foo[1]["body"]
