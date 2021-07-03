@@ -43,7 +43,7 @@ class WABot():
             return self.send_requests('sendFile', data)
         return self.send_requests("sendMessage", {})
 
-    def start(self,chatId):
+    def start(self):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
         interval = [t for t in range(1, 61)]
@@ -74,15 +74,12 @@ class WABot():
         if self.dict_messages != []:
             print(self.dict_messages)
             for message in self.dict_messages:
-                text = message['body'].split()
+                text = message['body']
                 if not message['fromMe']:
                     id  = message['chatId']
                     if id == foo.CHAT_ID:
-                        url = f"{self.APIUrl}messagesHistory?page=0&count=10&chatId={id}&token={self.token}"
-                        foo = requests.get(url).json()["messages"]
-                        prevMessage = foo[1]["body"]
-                        if text[0] == "1":
-                            return self.start(id)
-                        elif text[0] == "0":
+                        if text == "1":
+                            return self.start()
+                        elif text == "0":
                             return self.stop(id)
         return 'NoCommand'
