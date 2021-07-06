@@ -43,7 +43,7 @@ class WABot():
             return self.send_requests('sendFile', data)
         return self.send_requests("sendMessage", {})
 
-    def start(self):
+    def start(self, text):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
         interval = [t for t in range(1, 61)]
@@ -57,7 +57,7 @@ class WABot():
                     chatId = f"{number}@c.us"
                     f = worksheet.acell("D1").value
                     if f == "1":
-                        resp = self.send_message(chatId=chatId, text="Hello")
+                        resp = self.send_message(chatId=chatId, text=text)
                         worksheet.update(f"C{i}", "Sent")
                         time.sleep(random.choice(interval))
                     else:
@@ -78,8 +78,5 @@ class WABot():
                 if not message['fromMe']:
                     id  = message['chatId']
                     if id == foo.CHAT_ID:
-                        if text == "1":
-                            return self.start()
-                        elif text == "0":
-                            return self.stop(id)
+                        return self.start(text)
         return 'NoCommand'
