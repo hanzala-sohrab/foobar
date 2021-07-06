@@ -1,4 +1,4 @@
-import json, requests, datetime, time, random
+import json, requests, time, random
 import gspread
 import foo
 
@@ -32,7 +32,7 @@ class WABot():
         return answer
 
     def file(self, chatId, format, fileName, url, caption=''):
-        availableFiles = ['doc', 'gif', 'jpg', 'png', 'pdf', 'mp4', 'mp3', 'mkv']
+        availableFiles = ['doc', 'gif', 'jpg', 'png', 'pdf', 'mp4', 'mp3', 'mkv', 'jpeg']
         if format in availableFiles:
             data = {
                 'chatId' : chatId,
@@ -43,7 +43,7 @@ class WABot():
             return self.send_requests('sendFile', data)
         return self.send_requests("sendMessage", {})
 
-    def start(self, text):
+    def start(self, imageURL, filename, _format, caption):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
         interval = [t for t in range(1, 61)]
@@ -57,7 +57,8 @@ class WABot():
                     chatId = f"{number}@c.us"
                     f = worksheet.acell("D1").value
                     if f == "1":
-                        resp = self.send_message(chatId=chatId, text=text)
+                        # resp = self.send_message(chatId=chatId, text=text)
+                        resp = self.file(chatId=chatId, url=imageURL, format=_format, fileName=filename, caption=caption)
                         worksheet.update(f"C{i}", "Sent")
                         time.sleep(random.choice(interval))
                     else:
@@ -74,9 +75,21 @@ class WABot():
         if self.dict_messages != []:
             print(self.dict_messages)
             for message in self.dict_messages:
-                text = message['body']
-                if not message['fromMe']:
-                    id  = message['chatId']
-                    if id == foo.CHAT_ID:
-                        return self.start(text)
+                _id = message['chatId']
+                if message['fromMe'] and _id == foo.CHAT_ID:
+                    messageType = message['type']
+                    if messageType == "image":
+                        imageURL = message['body']
+                        caption = message['caption']
+                        file = imageURL.split("/")[-1]
+                        filename = file.split(".")[0]
+                        _format = file.split(".")[1]
+                        if caption is None:
+                            caption = ""
+                        return self.start(imageURL=imageURL, filename=filename, _format=_format, caption=caption)
+                # text = message['body']
+                # if not message['fromMe']:
+                #     id  = message['chatId']
+                #     if id == foo.CHAT_ID:
+                #         return self.start(text)
         return 'NoCommand'
