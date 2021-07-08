@@ -57,8 +57,30 @@ class WABot():
                     chatId = f"{number}@c.us"
                     f = worksheet.acell("D1").value
                     if f == "1":
-                        # resp = self.send_message(chatId=chatId, text=text)
                         resp = self.file(chatId=chatId, url=imageURL, format=_format, fileName=filename, caption=caption)
+                        worksheet.update(f"C{i}", "Sent")
+                        time.sleep(random.choice(interval))
+                    else:
+                        break
+            except:
+                continue
+        return {"status": "success"}
+    
+    def start(self, text):
+        worksheet.update("D1", "1")
+        numbers = worksheet.col_values(1)
+        interval = [t for t in range(1, 61)]
+        i = 0
+        for number in numbers:
+            i += 1
+            try:
+                val = worksheet.acell(f"C{i}").value
+                if val is None:
+                    phone = int(number)
+                    chatId = f"{number}@c.us"
+                    f = worksheet.acell("D1").value
+                    if f == "1":
+                        resp = self.send_message(chatId=chatId, text=text)
                         worksheet.update(f"C{i}", "Sent")
                         time.sleep(random.choice(interval))
                     else:
@@ -76,7 +98,7 @@ class WABot():
             print(self.dict_messages)
             for message in self.dict_messages:
                 _id = message['chatId']
-                if message['fromMe'] and _id == foo.CHAT_ID:
+                if _id == foo.CHAT_ID:
                     messageType = message['type']
                     if messageType == "image":
                         imageURL = message['body']
@@ -87,9 +109,7 @@ class WABot():
                         if caption is None:
                             caption = ""
                         return self.start(imageURL=imageURL, filename=filename, _format=_format, caption=caption)
-                # text = message['body']
-                # if not message['fromMe']:
-                #     id  = message['chatId']
-                #     if id == foo.CHAT_ID:
-                #         return self.start(text)
+                    elif messageType == "chat":
+                        text = message['body']
+                        return self.start(text=text)
         return 'NoCommand'
