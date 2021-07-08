@@ -46,7 +46,7 @@ class WABot():
     def start1(self, url, filename, _format, caption):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
-        interval = [t for t in range(1, 61)]
+        interval = [t for t in range(1, 11)]
         i = 0
         for number in numbers:
             i += 1
@@ -69,7 +69,7 @@ class WABot():
     def start2(self, text):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
-        interval = [t for t in range(1, 61)]
+        interval = [t for t in range(1, 11)]
         i = 0
         for number in numbers:
             i += 1
