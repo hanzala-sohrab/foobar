@@ -1,4 +1,4 @@
-import json, requests, datetime, time, random
+import json, requests, time, random
 import gspread
 import foo
 
@@ -32,7 +32,7 @@ class WABot():
         return answer
 
     def file(self, chatId, format, fileName, url, caption=''):
-        availableFiles = ['doc', 'gif', 'jpg', 'png', 'pdf', 'mp4', 'mp3', 'mkv']
+        availableFiles = ['doc', 'gif', 'jpg', 'png', 'pdf', 'mp4', 'mp3', 'mkv', 'jpeg']
         if format in availableFiles:
             data = {
                 'chatId' : chatId,
@@ -43,10 +43,10 @@ class WABot():
             return self.send_requests('sendFile', data)
         return self.send_requests("sendMessage", {})
 
-    def start(self):
+    def start1(self, url, filename, _format, caption):
         worksheet.update("D1", "1")
         numbers = worksheet.col_values(1)
-        interval = [t for t in range(1, 61)]
+        interval = [t for t in range(1, 11)]
         i = 0
         for number in numbers:
             i += 1
@@ -57,7 +57,30 @@ class WABot():
                     chatId = f"{number}@c.us"
                     f = worksheet.acell("D1").value
                     if f == "1":
-                        resp = self.send_message(chatId=chatId, text="Hello")
+                        resp = self.file(chatId=chatId, url=url, format=_format, fileName=filename, caption=caption)
+                        worksheet.update(f"C{i}", "Sent")
+                        time.sleep(random.choice(interval))
+                    else:
+                        break
+            except:
+                continue
+        return {"status": "success"}
+    
+    def start2(self, text):
+        worksheet.update("D1", "1")
+        numbers = worksheet.col_values(1)
+        interval = [t for t in range(1, 11)]
+        i = 0
+        for number in numbers:
+            i += 1
+            try:
+                val = worksheet.acell(f"C{i}").value
+                if val is None:
+                    phone = int(number)
+                    chatId = f"{number}@c.us"
+                    f = worksheet.acell("D1").value
+                    if f == "1":
+                        resp = self.send_message(chatId=chatId, text=text)
                         worksheet.update(f"C{i}", "Sent")
                         time.sleep(random.choice(interval))
                     else:
@@ -74,12 +97,26 @@ class WABot():
         if self.dict_messages != []:
             print(self.dict_messages)
             for message in self.dict_messages:
-                text = message['body']
-                if not message['fromMe']:
-                    id  = message['chatId']
-                    if id == foo.CHAT_ID:
-                        if text == "1":
-                            return self.start()
-                        elif text == "0":
-                            return self.stop(id)
+                _id = message['chatId']
+                if _id == foo.CHAT_ID:
+                    messageType = message['type']
+                    if messageType == "image":
+                        imageURL = message['body']
+                        caption = message['caption']
+                        file = imageURL.split("/")[-1]
+                        filename = file.split(".")[0]
+                        _format = file.split(".")[1]
+                        if caption is None:
+                            caption = ""
+                        return self.start1(url=imageURL, filename=filename, _format=_format, caption=caption)
+                    elif messageType == "chat":
+                        text = message['body']
+                        return self.start2(text=text)
+                    elif messageType == "document":
+                        url = message['body']
+                        caption = message['caption']
+                        file = caption
+                        filename = file.split(".")[0]
+                        _format = file.split(".")[1]
+                        return self.start1(url=url, filename=filename, _format=_format, caption=caption)
         return 'NoCommand'
